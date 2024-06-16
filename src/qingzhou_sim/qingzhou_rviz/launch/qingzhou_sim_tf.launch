@@ -1,0 +1,24 @@
+<launch>
+  <arg name="robot_name_1" default="qingzhou" />
+  <arg name="robot_name_2" default="qingzhou_1" /> 
+  <arg name="robot_name_3" default="qingzhou_2" />
+  <arg name="robot_name_4" default="qingzhou_3" />
+
+  <include file="$(find qingzhou_gazebo)/launch/text.launch" >
+    <arg name="namespace" value="$(arg robot_name_1)" />
+    <arg name="namespace_1" value="$(arg robot_name_2)" />
+    <arg name="namespace_2" value="$(arg robot_name_3)" />
+    <arg name="namespace_3" value="$(arg robot_name_4)" />
+  </include>
+
+  <node pkg="tf" type="static_transform_publisher" name="world_to_global_1" args="0 0 0 0 0 0 world $(arg robot_name_1)/odom 20" />
+  <node pkg="tf" type="static_transform_publisher" name="world_to_global_2" args="0 0 0 0 0 0 world $(arg robot_name_2)/odom 20" />
+  <node pkg="tf" type="static_transform_publisher" name="world_to_global_3" args="0 0 0 0 0 0 world $(arg robot_name_3)/odom 20" />
+  <node pkg="tf" type="static_transform_publisher" name="world_to_global_4" args="0 0 0 0 0 0 world $(arg robot_name_4)/odom 20" />
+
+
+  <!-- RVIZ可视化调试工具 -->
+  <node name="rviz" pkg="rviz" type="rviz" />
+</launch>
+
+

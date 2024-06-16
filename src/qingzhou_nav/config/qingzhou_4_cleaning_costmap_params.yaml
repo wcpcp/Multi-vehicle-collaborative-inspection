@@ -1,0 +1,15 @@
+cleaning_costmap:
+   global_frame: qingzhou_4/map
+   robot_base_frame: qingzhou_4/base_link
+   update_frequency: 6.0
+   publish_frequency: 3.0
+   static_map: true
+   rolling_window: false
+   resolution: 0.2
+   transform_tolerance: 2.0
+   inflation_radius: 0.2
+   map_type: costmap
+
+cleaning_plan_nodehandle:   
+   size_of_cell: 30
+   grid_covered_value: 3000

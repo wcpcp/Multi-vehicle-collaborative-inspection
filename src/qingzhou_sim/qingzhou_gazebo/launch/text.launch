@@ -1,0 +1,195 @@
+<launch>
+    <arg name="model" default="$(find qingzhou_description)/urdf/qingzhou.urdf.xacro"/>
+    <arg name="namespace" default="/qingzhou" />
+    <arg name="namespace_1" default="/qingzhou_1" />
+    <arg name="namespace_2" default="/qingzhou_2" />
+    <arg name="namespace_3" default="/qingzhou_3" />
+    <arg name="world_name" default="worlds/empty_world" />
+
+     <arg name="cmd_timeout" default="0.5"/>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="1.0" />
+    <arg name="roll" default="0.0"/>
+    <arg name="pitch" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+
+    <arg name="namespace_1_x" default="0.0"/>
+    <arg name="namespace_1_y" default="1.0"/>
+    <arg name="namespace_1_z" default="1.0" />
+    <arg name="namespace_1_roll" default="0.0"/>
+    <arg name="namespace_1_pitch" default="0.0"/>
+    <arg name="namespace_1_yaw" default="0.0"/>
+
+    <arg name="namespace_2_x" default="1.0"/>
+    <arg name="namespace_2_y" default="1.0"/>
+    <arg name="namespace_2_z" default="1.0" />
+    <arg name="namespace_2_roll" default="0.0"/>
+    <arg name="namespace_2_pitch" default="0.0"/>
+    <arg name="namespace_2_yaw" default="0.0"/>
+
+
+     <arg name="namespace_3_x" default="1.0"/>
+    <arg name="namespace_3_y" default="0.0"/>
+    <arg name="namespace_3_z" default="1.0" />
+    <arg name="namespace_3_roll" default="0.0"/>
+    <arg name="namespace_3_pitch" default="0.0"/>
+    <arg name="namespace_3_yaw" default="0.0"/>
+
+    <!-- 启动 gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" default="$(arg world_name)"/>
+    </include>
+
+
+
+    <group ns="$(arg namespace)">
+        <!-- 将 Urdf 文件的内容加载到参数服务器 -->
+        <!-- Load the robot description -->
+         <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find qingzhou_description)/urdf/qingzhou_run.urdf.xacro' prefix:=$(arg namespace)"/>
+        <!-- <param name="robot_description" command="$(find xacro)/xacro $(arg model)" /> -->
+        <!-- Load ros_controllers configuration parameters -->
+        <rosparam file="$(find qingzhou_control)/config/ctrl_ackermann_steering_controller.yaml" command="load" ns="$(arg namespace)" />
+        <rosparam file="$(find qingzhou_control)/config/ctrl_gains.yaml" command="load" ns="$(arg namespace)" />
+        <rosparam file="$(find qingzhou_control)/config/ctrl_joint_state_publisher.yaml" command="load" ns="$(arg namespace)" />
+        <rosparam file="$(find qingzhou_control)/config/ctrl_qingzhou_hardware_gazebo.yaml" command="load" ns="$(arg namespace)" />
+         <!-- Spawn the controllers
+            <node pkg="controller_manager" type="spawner" name="controller_spawner" ns="$(arg namespace_1)"
+                args="joint_state_publisher ackermann_steering_controller"
+                output="screen" respawn="false" /> -->
+            <!-- 运行joint_state_publisher节点，发布机器人的关节状态  -->
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+            <param name="rate" value="50"/>
+        </node> 
+            <!-- Launch  the robot state publisher -->
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+            <param name="publish_frequency" value="50.0"/>
+            <param name="tf_prefix" value="/qingzhou" />
+        </node>
+        <!-- 在 gazebo 中显示机器人模型 -->
+        <!-- Spawn robot in Gazebo -->
+        <node name="spawn_vehicle" pkg="gazebo_ros" type="spawn_model"
+            args="-urdf -param robot_description -model qingzhou
+                
+                -x $(arg x) -y $(arg y) -z $(arg z)
+                -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"
+            respawn="false" output="screen" />
+    <node pkg="qingzhou_description" type="gazebo_odometry.py" name="gazebo_odometry"  arg=""/>
+    <!-- <node pkg="tf" type="static_transform_publisher" name="ydlidar_link_to_laser" args="0.0 0.0 0.0 0.0 0 0  /ydlidar_link /qingzhou/ydlidar_link  20" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_link_to_bot" args="0.0 0.0 0.0 3.14 0  0    /camera_link  qingzhou/  20" /> -->
+
+    </group>
+
+  
+    <group ns="$(arg namespace_1)">
+
+            <!-- 将 Urdf 文件的内容加载到参数服务器 -->
+            <!-- Load the robot description -->
+            <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find qingzhou_description)/urdf/qingzhou_run.urdf.xacro' prefix:=$(arg namespace_1)"/>
+        <!-- <param name="robot_description" command="$(find xacro)/xacro $(arg model)" /> -->
+            <!-- Load ros_controllers configuration parameters -->
+            <rosparam file="$(find qingzhou_control)/config/ctrl_ackermann_steering_controller.yaml" command="load" ns="$(arg namespace_1)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_gains.yaml" command="load" ns="$(arg namespace_1)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_joint_state_publisher.yaml" command="load" ns="$(arg namespace_1)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_qingzhou_hardware_gazebo.yaml" command="load" ns="$(arg namespace_1)" />
+            <!-- Spawn the controllers
+            <node pkg="controller_manager" type="spawner" name="controller_spawner" ns="$(arg namespace_1)"
+                args="joint_state_publisher ackermann_steering_controller"
+                output="screen" respawn="false" /> -->
+            <!-- 运行joint_state_publisher节点，发布机器人的关节状态  -->
+            <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+                <param name="rate" value="50"/>
+            </node> 
+                <!-- Launch  the robot state publisher -->
+            <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+                <param name="publish_frequency" value="50.0"/>
+                <param name="tf_prefix" value="/qingzhou_1" />
+            </node>
+            <!-- 在 gazebo 中显示机器人模型 -->
+            <!-- Spawn robot in Gazebo -->
+            <node name="spawn_vehicle" pkg="gazebo_ros" type="spawn_model"
+                args="-urdf -param robot_description -model qingzhou_1
+                    
+                    -x $(arg namespace_1_x) -y $(arg namespace_1_y) -z $(arg namespace_1_z)
+                    -R $(arg namespace_1_roll) -P $(arg namespace_1_pitch) -Y $(arg namespace_1_yaw)"
+                respawn="false" output="screen" />
+        <node pkg="qingzhou_description" type="gazebo_odometry.py" name="gazebo_odometry" />
+        <!-- <node pkg="tf" type="static_transform_publisher" name="ydlidar_link_to_laser" args="0.0 0.0 0.0 0.0 0 0  /ydlidar_link /qingzhou_1/ydlidar_link  20" />
+        <node pkg="tf" type="static_transform_publisher" name="camera_link_to_bot" args="0.0 0.0 0.0 3.14 0  0   /camera_link  qingzhou_1/  20" /> -->
+        </group>
+
+        <group ns="$(arg namespace_2)">
+            <!-- 将 Urdf 文件的内容加载到参数服务器 -->
+            <!-- Load the robot description -->
+             <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find qingzhou_description)/urdf/qingzhou_run.urdf.xacro' prefix:=$(arg namespace_2)"/>
+        <!-- <param name="robot_description" command="$(find xacro)/xacro $(arg model)" /> -->
+            <!-- Load ros_controllers configuration parameters -->
+            <rosparam file="$(find qingzhou_control)/config/ctrl_ackermann_steering_controller.yaml" command="load" ns="$(arg namespace_2)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_gains.yaml" command="load" ns="$(arg namespace_2)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_joint_state_publisher.yaml" command="load" ns="$(arg namespace_2)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_qingzhou_hardware_gazebo.yaml" command="load" ns="$(arg namespace_2)" />
+             <!-- Spawn the controllers
+            <node pkg="controller_manager" type="spawner" name="controller_spawner" ns="$(arg namespace_1)"
+                args="joint_state_publisher ackermann_steering_controller"
+                output="screen" respawn="false" /> -->
+            <!-- 运行joint_state_publisher节点，发布机器人的关节状态  -->
+            <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+                <param name="rate" value="50"/>
+            </node> 
+                <!-- Launch  the robot state publisher -->
+            <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+                <param name="publish_frequency" value="50.0"/>
+                <param name="tf_prefix" value="/qingzhou_2" />
+            </node>
+            <!-- 在 gazebo 中显示机器人模型 -->
+            <!-- Spawn robot in Gazebo -->
+            <node name="spawn_vehicle" pkg="gazebo_ros" type="spawn_model"
+                args="-urdf -param robot_description -model qingzhou_2
+                    -x $(arg namespace_2_x) -y $(arg namespace_2_y) -z $(arg namespace_2_z)
+                    -R $(arg namespace_2_roll) -P $(arg namespace_2_pitch) -Y $(arg namespace_2_yaw)"
+                respawn="false" output="screen" />
+        <node pkg="qingzhou_description" type="gazebo_odometry.py" name="gazebo_odometry" />
+        <!-- <node pkg="tf" type="static_transform_publisher" name="ydlidar_link_to_laser" args="0.0 0.0 0.0 0.0 0 0  /ydlidar_link /qingzhou_2/ydlidar_link  20" />
+        <node pkg="tf" type="static_transform_publisher" name="camera_link_to_bot" args="0.0 0.0 0.0 3.14 0  0    /camera_link  qingzhou_2/  20" /> -->
+        </group>
+
+         <group ns="$(arg namespace_3)">
+            <!-- 将 Urdf 文件的内容加载到参数服务器 -->
+            <!-- Load the robot description -->
+             <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find qingzhou_description)/urdf/qingzhou_run.urdf.xacro' prefix:=$(arg namespace_3)"/>
+        <!-- <param name="robot_description" command="$(find xacro)/xacro $(arg model)" /> -->
+            <!-- Load ros_controllers configuration parameters -->
+            <rosparam file="$(find qingzhou_control)/config/ctrl_ackermann_steering_controller.yaml" command="load" ns="$(arg namespace_3)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_gains.yaml" command="load" ns="$(arg namespace_3)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_joint_state_publisher.yaml" command="load" ns="$(arg namespace_3)" />
+            <rosparam file="$(find qingzhou_control)/config/ctrl_qingzhou_hardware_gazebo.yaml" command="load" ns="$(arg namespace_3)" />
+             <!-- Spawn the controllers
+            <node pkg="controller_manager" type="spawner" name="controller_spawner" ns="$(arg namespace_1)"
+                args="joint_state_publisher ackermann_steering_controller"
+                output="screen" respawn="false" /> -->
+            <!-- 运行joint_state_publisher节点，发布机器人的关节状态  -->
+            <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+                <param name="rate" value="50"/>
+            </node> 
+            <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+                <param name="publish_frequency" value="50.0"/>
+                <param name="tf_prefix" value="/qingzhou_3" />
+            </node>
+            <!-- 在 gazebo 中显示机器人模型 -->
+            <!-- Spawn robot in Gazebo -->
+            <node name="spawn_vehicle" pkg="gazebo_ros" type="spawn_model"
+                args="-urdf -param robot_description -model qingzhou_3
+                    
+                    -x $(arg namespace_3_x) -y $(arg namespace_3_y) -z $(arg namespace_3_z)
+                    -R $(arg namespace_3_roll) -P $(arg namespace_3_pitch) -Y $(arg namespace_3_yaw)"
+                respawn="false" output="screen" />
+        <node pkg="qingzhou_description" type="gazebo_odometry.py" name="gazebo_odometry" />
+        <!-- <node pkg="tf" type="static_transform_publisher" name="ydlidar_link_to_laser" args="0.0 0.0 0.0 0.0 0 0  /ydlidar_link /qingzhou_3/ydlidar_link  20" />
+        <node pkg="tf" type="static_transform_publisher" name="camera_link_to_bot" args="0.0 0.0 0.0 3.14 0  0    /camera_link  qingzhou_3/  20" /> -->
+        </group>
+        <!-- <node pkg="tf" type="static_transform_publisher" name="world_to_global_1" args="0 0 0 0 0 0 world $(arg namespace)/odom 20" />
+        <node pkg="tf" type="static_transform_publisher" name="world_to_global_2" args="0 0 0 0 0 0 world $(arg namespace_1)/odom 20" />
+        <node pkg="tf" type="static_transform_publisher" name="world_to_global_3" args="0 0 0 0 0 0 world $(arg namespace_2)/odom 20" />
+        <node pkg="tf" type="static_transform_publisher" name="world_to_global_4" args="0 0 0 0 0 0 world $(arg namespace_3)/odom 20" /> -->
+</launch>
+

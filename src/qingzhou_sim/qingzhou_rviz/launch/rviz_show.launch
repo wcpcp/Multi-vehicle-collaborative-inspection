@@ -1,0 +1,7 @@
+<launch>
+    <arg name="rvizconfig" default="$(find qingzhou_rviz)/config/qingzhou_sim.rviz" />
+    <!-- <arg name="rvizconfig_1" default="$(find qingzhou_rviz)/config/qingzhou_1_sim.rviz" /> -->
+    <!-- <arg name="rvizconfig" default="$(find qingzhou_rviz)/config/qingzhou_2_sim.rviz" />
+    <arg name="rvizconfig" default="$(find qingzhou_rviz)/config/qingzhou_3_sim.rviz" /> -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"  output="screen"/>
+</launch>

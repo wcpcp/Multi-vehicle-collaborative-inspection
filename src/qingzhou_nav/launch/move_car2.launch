@@ -1,0 +1,44 @@
+<launch>
+
+    <!-- 迷你机器人，基础参数 -->
+    <arg name="robot_name" default="qingzhou_2" />
+    <!-- <arg name="scan_topic" default="scan" />
+    <arg name="odom_topic" default="odom" />
+    <arg name="cmd_vel_topic" default="cmd_vel" />
+    <arg name="map_topic" default="map" /> -->
+    <arg name="plan_topic" default="/$(arg robot_name)/global_plan" /> 
+
+
+
+    <!-- TF坐标变换，基础参数 -->
+    <!-- <arg name="global_frame_id" default="$(arg robot_name)/map" />
+    <arg name="base_frame_id" default="$(arg robot_name)/base_link" />
+    <arg name="odom_frame_id" default="$(arg robot_name)/odom" /> -->
+
+
+
+
+
+    <group ns="$(arg robot_name)">
+        <param name="/robot_name/map" value="/$(arg robot_name)/map" />
+        <param name="/robot_name/odom" value="/$(arg robot_name)/odom" />
+        <param name="/robot_name/path" value="/$(arg robot_name)/path_planning_node/cleaning_plan_nodehandle/cleaning_path" />
+        <param name="/NextGoal/tolerance_goal" value="2.00" />
+        <node pkg="qingzhou_nav" type="next_goal" respawn="true" name="next_goal" output="screen" >
+        </node>
+        
+         <node pkg="qingzhou_nav" type="path_planning.py" name="path_planner" output="screen">
+            <param name="robot_name" value="$(arg robot_name)" />
+            <param name="plan_topic" value="$(arg plan_topic)" />
+        </node>
+
+        <node pkg="qingzhou_nav" type="path_tracking.py" name="path_tracker" output="screen">
+            <param name="robot_name" value="$(arg robot_name)" />
+            <param name="plan_topic" value="$(arg plan_topic)" />
+        </node>
+
+    </group>
+  
+</launch>
+
+
